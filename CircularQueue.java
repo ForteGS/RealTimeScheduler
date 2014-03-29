@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * 
  * @author Minh Bui
  */
-public class CircularQueue<E> implements QueueADT {
+public class CircularQueue<E> implements QueueADT<E> {
 	private ArrayList<E> array;
 	private int front;
 	private int rear;
@@ -20,7 +20,7 @@ public class CircularQueue<E> implements QueueADT {
 		numItems = 0;
 		this.maxCapacity = maxCapacity;
 	}
-
+	
 	/**
 	 * Checks if the queue is empty.
 	 * 
@@ -79,35 +79,6 @@ public class CircularQueue<E> implements QueueADT {
 	}
 
 	/**
-	 * Inserts the item at the rear of the queue.
-	 * 
-	 * @param item
-	 *            The item to add to the queue.
-	 * @throws FullQueueException
-	 *             if the queue is full
-	 */
-	public void enqueue(E item) throws FullQueueException {
-		if (this.isFull())
-			throw new FullQueueException();
-		else {
-			
-			if (array.size() == maxCapacity) {
-				if (rear > front) {
-					array.set(0, item);
-					rear = 0;
-				} else if (rear < front) {
-					array.set(rear + 1, item);
-					rear++;
-				}
-			} else {
-				array.add(item);
-				rear++;
-			}
-		}
-		numItems++;
-	}
-
-	/**
 	 * Returns the number of items the queue can hold
 	 * 
 	 * @return the number of items the queue can hold
@@ -131,6 +102,50 @@ public class CircularQueue<E> implements QueueADT {
 	 * @return a string representation of the queue
 	 */
 	public String toString() {
-		return "";
+		int f = front;
+		int r = rear;
+		String outString = "";
+		if (f < r)	{
+			while (f < r)	{
+				outString += array.get(f).toString();
+				f++;
+			}
+		} else if (f > r)	{
+			while (f < array.size())	{
+				outString += array.get(f).toString();
+			}
+			for(int i = 0; i <= r; i++)	{
+				outString += array.get(i).toString();
+			}
+		}
+		return outString;
+	}
+
+	/**
+	 * Inserts the item at the rear of the queue.
+	 * 
+	 * @param item The item to add to the queue.
+	 * @throws FullQueueException if the queue is full
+	 */
+	public void enqueue(E item) throws FullQueueException {
+		if (this.isEmpty())	
+			front = 0;
+		if (this.isFull())
+			throw new FullQueueException();
+		else {
+			if (numItems == maxCapacity) {
+				if (rear > front) {
+					array.set(0, item);
+		 			rear = 0;
+				} else if (rear < front) {
+					array.set(rear + 1, item);
+					rear++;
+				}
+			} else {
+				array.add(item);
+				rear++;
+			}
+		}
+		numItems++;
 	}
 }
