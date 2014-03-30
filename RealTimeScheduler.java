@@ -3,6 +3,46 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+///////////////////////////////////////////////////////////////////////////////
+//ALL STUDENTS COMPLETE THESE SECTIONS
+//Title:            Real Time Scheduler
+//
+//Files:            RealTimeScheduler.java
+//					CircularQueue.java
+//					Compare.java
+//					ComputeResource.java
+//					ComputeResourceGenerator.java
+//					EmptyQueueException.java
+//					FullQueueException.java
+//					PriorityQueue.java
+//					ProcessGenerator.java
+//					QueueADT.java
+//					RealTimeScheduler.java
+//					Task.java
+//
+//Semester:         CS367 Spring 2014
+//
+//Author:           Minh Bui
+//Email:            mbui2@wisc.edu
+//CS Login:         minh
+//Lecturer's Name:  Jim Skrentny
+//Lab Section:      null
+//
+////////////////////PAIR PROGRAMMERS COMPLETE THIS SECTION ////////////////////
+//CHECK ASSIGNMENT PAGE TO see IF PAIR-PROGRAMMING IS ALLOWED
+//If allowed, learn what PAIR-PROGRAMMING IS, 
+//choose a partner wisely, and complete this section.
+//
+//Pair Partner:     null
+//Email:            null
+//CS Login:         null
+//Lecturer's Name:  null
+//Lab Section:      null
+//
+//STUDENTS WHO GET HELP FROM ANYONE OTHER THAN THEIR PARTNER
+//Credits:          null
+////////////////////////////80 columns wide //////////////////////////////////
+
 public class RealTimeScheduler {
 	public static void main(String[] args) {
 		// Checking for the number of passed arguments.
@@ -64,7 +104,7 @@ public class RealTimeScheduler {
 
 				for (int j = 0; j < tasks.size(); j++)
 					prioTasks.enqueue(tasks.get(j));
-
+				System.out.println(prioTasks);
 				while (!compRes.isEmpty()) {
 					int value = compRes.dequeue().getValue();
 					if (prioTasks.isEmpty())
@@ -76,11 +116,11 @@ public class RealTimeScheduler {
 							deqTasks.add(deqTask);
 					}
 				}
-
-				for (int m = 0; m < deqTasks.size(); m++) {
+				
+				for (int m = 0; m < deqTasks.size(); m++) 
 					prioTasks.enqueue(deqTasks.get(m));
-				}
-
+				
+				System.out.println(prioTasks);
 				if (!prioTasks.isEmpty() && prioTasks.peek().missedDeadline(i)) {
 					System.out.println("Deadline missed at timestep " + i);
 					in.close();
@@ -121,7 +161,7 @@ public class RealTimeScheduler {
 			return lcm(list.get(0), list.get(1));
 		int result = list.get(list.size() - 1);
 		for (int i = list.size() - 1; i >= 0; i--)
-			result = lcm(list.get(i), result);	
+			result = lcm(list.get(i), result);
 		return result;
 	}
 

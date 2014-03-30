@@ -1,3 +1,28 @@
+///////////////////////////////////////////////////////////////////////////////
+//                   ALL STUDENTS COMPLETE THESE SECTIONS
+// Main Class File:  RealTimeScheduler.java 
+// File:             PriorityQueue.java
+// Semester:         CS367 Spring 2014
+//
+// Author:           Minh Bui
+// CS Login:         minh
+// Lecturer's Name:  Jim Skrentny
+// Lab Section:      null
+//
+//////////////////// PAIR PROGRAMMERS COMPLETE THIS SECTION ////////////////////
+//                   CHECK ASSIGNMENT PAGE TO see IF PAIR-PROGRAMMING IS ALLOWED
+//                   If allowed, learn what PAIR-PROGRAMMING IS, 
+//                   choose a partner wisely, and complete this section.
+//
+// Pair Partner:     null
+// CS Login:         null
+// Lecturer's Name:  null
+// Lab Section:      null
+//
+//                   STUDENTS WHO GET HELP FROM ANYONE OTHER THAN THEIR PARTNER
+// Credits:          null
+//////////////////////////// 80 columns wide //////////////////////////////////
+
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -71,6 +96,7 @@ public class PriorityQueue<E> implements QueueADT<E> {
 		E temp = array.get(1);
 		array.remove(1);
 		numItems--;
+		array.get(array.size() - 1);
 		reheapify();
 		return temp;
 	}
@@ -117,7 +143,7 @@ public class PriorityQueue<E> implements QueueADT<E> {
 	 */
 	public String toString() {
 		String stringOutput = "";
-		for(int i = 0; i < numItems; i++)	{
+		for (int i = 0; i < numItems; i++) {
 			stringOutput += array.get(i + 1).toString();
 		}
 		stringOutput += "\nSize: " + array.size();
@@ -126,19 +152,21 @@ public class PriorityQueue<E> implements QueueADT<E> {
 
 	/**
 	 * Reheapify the array tree so that the array has the properties of a tree.
-	 * This method reheapifies the tree so that the smallest element will be 
-	 * the root of the tree.
+	 * This method reheapifies the tree so that the smallest element will be the
+	 * root of the tree.
 	 */
 	private void reheapify() {
 		int child = numItems;
 		boolean done = false;
 		while (!done) {
+			if (child <= 1)
+				done = true;
 			int parent = child / 2;
 			if (parent == 0)
 				done = true;
-			else if (comp.compare(array.get(child), array.get(parent)) >= 0)
-				done = true;
-			else {
+			else if (comp.compare(array.get(child), array.get(parent)) >= 0) {
+				child--;
+			} else {
 				E temp = array.get(child);
 				array.set(child, array.get(parent));
 				array.set(parent, temp);
