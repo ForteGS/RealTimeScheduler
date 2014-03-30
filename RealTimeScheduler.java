@@ -35,20 +35,8 @@ public class RealTimeScheduler {
 			capCirQ = Integer.parseInt(in.nextLine());
 			capPrioQ = Integer.parseInt(in.nextLine());
 
-			CircularQueue<ComputeResource> compRes = new CircularQueue<ComputeResource>(
-					capCirQ);
-			PriorityQueue<Task> prioTasks = new PriorityQueue<Task>(
-					new Compare(), capPrioQ);
-			ComputeResourceGenerator compResGen = new ComputeResourceGenerator(
-					maxCompRes);
-			ProcessGenerator proGen = new ProcessGenerator();
-
-			ArrayList<ComputeResource> availableResource = compResGen
-					.getResources();
 			ArrayList<Integer> listOfPeriods = new ArrayList<Integer>();
-
-			for (int i = 0; i < availableResource.size(); i++)
-				compRes.enqueue(availableResource.get(i));
+			ProcessGenerator proGen = new ProcessGenerator();
 
 			while (in.hasNext()) {
 				String[] processParam = in.nextLine().split(" ");
@@ -58,20 +46,63 @@ public class RealTimeScheduler {
 			}
 
 			int T = lcmList(listOfPeriods);
-			for (int i = 0; i < T; i++)	{
+			System.out.println(T);
+			for (int i = 0; i < T; i++) {
+				ComputeResourceGenerator compResGen = new ComputeResourceGenerator(
+						maxCompRes);
+				ArrayList<ComputeResource> availableResource = compResGen
+						.getResources();
 				ArrayList<Task> tasks = proGen.getTasks(i);
-				
-			}
+				CircularQueue<ComputeResource> compRes = new CircularQueue<ComputeResource>(
+						capCirQ);
+				PriorityQueue<Task> prioTasks = new PriorityQueue<Task>(
+						new Compare(), capPrioQ);
+				ArrayList<Task> deqTasks = new ArrayList<Task>();
 
+				for (int k = 0; k < availableResource.size(); k++)
+					compRes.enqueue(availableResource.get(k));
+
+				for (int j = 0; j < tasks.size(); j++)
+					prioTasks.enqueue(tasks.get(j));
+
+				while (!compRes.isEmpty()) {
+					int value = compRes.dequeue().getValue();
+					if (prioTasks.isEmpty())
+						break;
+					else {
+						Task deqTask = prioTasks.dequeue();
+						deqTask.updateProgress(value);
+						if (!deqTask.isComplete())
+							deqTasks.add(deqTask);
+					}
+				}
+
+				for (int m = 0; m < deqTasks.size(); m++) {
+					prioTasks.enqueue(deqTasks.get(m));
+				}
+
+				if (!prioTasks.isEmpty() && prioTasks.peek().missedDeadline(i)) {
+					System.out.println("Deadline missed at timestep " + i);
+					in.close();
+					return;
+				}
+
+			}
+			System.out
+					.println("Scheduling complete after " + T + " timesteps.");
 		} catch (FileNotFoundException e) {
 			System.err.println("File not found!");
 			return;
-		} catch (Exception e) {
-			System.err.println("Something went wrong.");
-			return;
+		} catch (EmptyQueueException e) {
+			System.err.println("Some queues are empty.");
+		} catch (FullQueueException e) {
+			System.err.println("Some queues are full.");
 		}
+		// catch (Exception e) {
+		// System.err.println("Something went wrong.");
+		// return;
+		// }
 
-		in.close();
 	}
 
 	/**
@@ -82,21 +113,25 @@ public class RealTimeScheduler {
 	 * @return The largest common multiple of those integers.
 	 */
 	private static int lcmList(ArrayList<Integer> list) {
-		int result = 0;
+		if (list.size() == 0)
+			throw new NullPointerException();
+		if (list.size() == 1)
+			return list.get(0);
 		if (list.size() == 2)
 			return lcm(list.get(0), list.get(1));
-		else {
-			for (int i = list.size() - 1; i >= 2; i--) {
-				result = lcm(list.get(i), lcm(list.get(i - 1), list.get(i - 2)));
-			}
-			return result;
-		}
+		int result = list.get(list.size() - 1);
+		for (int i = list.size() - 1; i >= 0; i--)
+			result = lcm(list.get(i), result);	
+		return result;
 	}
 
 	/**
 	 * Compute the least common multiple of 2 integers.
-	 * @param a The first integer.
-	 * @param b The second integer.
+	 * 
+	 * @param a
+	 *            The first integer.
+	 * @param b
+	 *            The second integer.
 	 * @return The largest common multiple of a and b.
 	 */
 	private static int lcm(int a, int b) {
@@ -105,8 +140,11 @@ public class RealTimeScheduler {
 
 	/**
 	 * Compute the greatest common divisor of 2 integers.
-	 * @param a The first integer.
-	 * @param b The second integer.
+	 * 
+	 * @param a
+	 *            The first integer.
+	 * @param b
+	 *            The second integer.
 	 * @return The greatest common divisor of a and b.
 	 */
 	private static int gcd(int a, int b) {
@@ -117,4 +155,5 @@ public class RealTimeScheduler {
 		}
 		return a;
 	}
+
 }

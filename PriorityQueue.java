@@ -66,7 +66,8 @@ public class PriorityQueue<E> implements QueueADT<E> {
 	 * @throws EmptyQueueException if the queue is empty
 	 */
 	public E dequeue() throws EmptyQueueException {
-		// TODO Auto-generated method stub
+		if (this.isEmpty())
+			throw new EmptyQueueException();
 		E temp = array.get(1);
 		array.remove(1);
 		numItems--;
@@ -82,7 +83,6 @@ public class PriorityQueue<E> implements QueueADT<E> {
 	 * @throws FullQueueException if the queue is full
 	 */
 	public void enqueue(E item) throws FullQueueException {
-		// TODO Auto-generated method stub
 		if (this.isFull())
 			throw new FullQueueException();
 		array.add(item);
@@ -118,8 +118,9 @@ public class PriorityQueue<E> implements QueueADT<E> {
 	public String toString() {
 		String stringOutput = "";
 		for(int i = 0; i < numItems; i++)	{
-			stringOutput += array.get(i).toString();
+			stringOutput += array.get(i + 1).toString();
 		}
+		stringOutput += "\nSize: " + array.size();
 		return stringOutput;
 	}
 
@@ -135,7 +136,7 @@ public class PriorityQueue<E> implements QueueADT<E> {
 			int parent = child / 2;
 			if (parent == 0)
 				done = true;
-			else if (comp.compare(array.get(child), array.get(parent)) <= 0)
+			else if (comp.compare(array.get(child), array.get(parent)) >= 0)
 				done = true;
 			else {
 				E temp = array.get(child);
