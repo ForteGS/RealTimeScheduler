@@ -1,8 +1,3 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
-
 ///////////////////////////////////////////////////////////////////////////////
 //ALL STUDENTS COMPLETE THESE SECTIONS
 //Title:            Real Time Scheduler
@@ -43,6 +38,11 @@ import java.util.Scanner;
 //Credits:          null
 ////////////////////////////80 columns wide //////////////////////////////////
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
 public class RealTimeScheduler {
 	public static void main(String[] args) {
 		// Checking for the number of passed arguments.
@@ -75,9 +75,15 @@ public class RealTimeScheduler {
 			capCirQ = Integer.parseInt(in.nextLine());
 			capPrioQ = Integer.parseInt(in.nextLine());
 
+			// This array list holds the periods. For calculating the least
+			// common multiple.
 			ArrayList<Integer> listOfPeriods = new ArrayList<Integer>();
 			ProcessGenerator proGen = new ProcessGenerator();
+			ComputeResourceGenerator compResGen = new ComputeResourceGenerator(
+					maxCompRes);
 
+			// Create new processes and store the period of each process into
+			// listOfPeriods.
 			while (in.hasNext()) {
 				String[] processParam = in.nextLine().split(" ");
 				proGen.addProcess(Integer.parseInt(processParam[0]),
@@ -86,47 +92,72 @@ public class RealTimeScheduler {
 			}
 
 			int T = lcmList(listOfPeriods);
-			System.out.println(T);
+			// Priority queue stores new generated tasks.
+			PriorityQueue<Task> prioTasks = new PriorityQueue<Task>(
+					new Compare(), capPrioQ);
+			CircularQueue<ComputeResource> compRes = new CircularQueue<ComputeResource>(
+					capCirQ);
+
 			for (int i = 0; i < T; i++) {
-				ComputeResourceGenerator compResGen = new ComputeResourceGenerator(
-						maxCompRes);
+				
+				if (!prioTasks.isEmpty() && prioTasks.peek().isComplete())
+					prioTasks.dequeue();
+				 
+				// Get new resource
 				ArrayList<ComputeResource> availableResource = compResGen
 						.getResources();
+
+				// Get tasks for timesteps i
 				ArrayList<Task> tasks = proGen.getTasks(i);
-				CircularQueue<ComputeResource> compRes = new CircularQueue<ComputeResource>(
-						capCirQ);
-				PriorityQueue<Task> prioTasks = new PriorityQueue<Task>(
-						new Compare(), capPrioQ);
+
+				// This array list contains tasks that are removed due to being
+				// applied with computing resource. After applying computing
+				// resource, we will put the tasks in this array list back into
+				// the priority queue.
 				ArrayList<Task> deqTasks = new ArrayList<Task>();
 
-				for (int k = 0; k < availableResource.size(); k++)
-					compRes.enqueue(availableResource.get(k));
+				// Adding resource to the queue.
 
+				for (int k = 0; k < capCirQ; k++) {
+					if (!compRes.isFull())
+						compRes.enqueue(availableResource.get(k));
+				}
+
+				// Adding tasks to the priority queue.
 				for (int j = 0; j < tasks.size(); j++)
 					prioTasks.enqueue(tasks.get(j));
-				System.out.println(prioTasks);
-				while (!compRes.isEmpty()) {
-					int value = compRes.dequeue().getValue();
-					if (prioTasks.isEmpty())
-						break;
-					else {
-						Task deqTask = prioTasks.dequeue();
-						deqTask.updateProgress(value);
-						if (!deqTask.isComplete())
-							deqTasks.add(deqTask);
-					}
-				}
-				
-				for (int m = 0; m < deqTasks.size(); m++) 
-					prioTasks.enqueue(deqTasks.get(m));
-				
-				System.out.println(prioTasks);
-				if (!prioTasks.isEmpty() && prioTasks.peek().missedDeadline(i)) {
-					System.out.println("Deadline missed at timestep " + i);
-					in.close();
-					return;
-				}
 
+				System.out.println(prioTasks);
+				// Applying resource to the highest tasks in the priority queue.
+				while (!compRes.isEmpty() && !prioTasks.isEmpty()) {
+					int value = compRes.dequeue().getValue();
+					// Applying resources to the tasks, remove the applied
+					// resources from the
+					// queue. Each task in the queue is applied resource
+					// only once per timestep.
+					Task deqTask = prioTasks.dequeue();
+					deqTask.updateProgress(value);
+
+					// Do not add completed tasks back to the queue.
+					if (!deqTask.isComplete())
+						deqTasks.add(deqTask);
+				}
+	
+				// Re-adding the incomplete tasks to the queue.
+				for (int m = 0; m < deqTasks.size(); m++)
+					prioTasks.enqueue(deqTasks.get(m));
+
+				
+				// Check for missed deadline.
+				try {
+					if (prioTasks.peek().missedDeadline(i)) {
+						System.out.println("Deadline missed at timestep " + i);
+						in.close();
+						return;
+					}
+				} catch (EmptyQueueException e) {
+					continue;
+				}
 			}
 			System.out
 					.println("Scheduling complete after " + T + " timesteps.");
@@ -135,13 +166,14 @@ public class RealTimeScheduler {
 			return;
 		} catch (EmptyQueueException e) {
 			System.err.println("Some queues are empty.");
+			return;
 		} catch (FullQueueException e) {
 			System.err.println("Some queues are full.");
+			return;
+		} catch (Exception e) {
+			System.err.println("Something went wrong.");
+			return;
 		}
-		// catch (Exception e) {
-		// System.err.println("Something went wrong.");
-		// return;
-		// }
 
 	}
 

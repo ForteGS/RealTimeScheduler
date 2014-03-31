@@ -36,6 +36,9 @@ import java.util.ArrayList;
 public class ProcessGenerator {
 	private ArrayList<Process> processList;
 
+	/**
+	 * Constructor: Creating a new array list to hold the processes.
+	 */
 	public ProcessGenerator() {
 		processList = new ArrayList<Process>();
 	}
@@ -45,10 +48,18 @@ public class ProcessGenerator {
 		processList.add(newProcess);
 	}
 
+	/**
+	 * Get the newly created tasks if t is a multiple of the periods of some
+	 * processes.
+	 * 
+	 * @param t
+	 *            Time
+	 * @return tasks An array list of newly created tasks based on time t.
+	 */
 	public ArrayList<Task> getTasks(int t) {
 		ArrayList<Task> tasks = new ArrayList<Task>();
 		for (int i = 0; i < processList.size(); i++) {
-			if (t % processList.get(i).getPeriod() == 0)	{
+			if (t % processList.get(i).getPeriod() == 0) {
 				Task newTask = new Task(processList.get(i), t);
 				tasks.add(newTask);
 			}

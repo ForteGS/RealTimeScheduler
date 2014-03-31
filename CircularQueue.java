@@ -45,7 +45,7 @@ public class CircularQueue<E> implements QueueADT<E> {
 		numItems = 0;
 		this.maxCapacity = maxCapacity;
 	}
-	
+
 	/**
 	 * Checks if the queue is empty.
 	 * 
@@ -130,16 +130,16 @@ public class CircularQueue<E> implements QueueADT<E> {
 		int f = front;
 		int r = rear;
 		String outString = "";
-		if (f < r)	{
-			while (f < r)	{
+		if (f < r) {
+			while (f < r) {
 				outString += array.get(f).toString();
 				f++;
 			}
-		} else if (f > r)	{
-			while (f < array.size())	{
+		} else if (f > r) {
+			while (f < array.size()) {
 				outString += array.get(f).toString();
 			}
-			for(int i = 0; i <= r; i++)	{
+			for (int i = 0; i <= r; i++) {
 				outString += array.get(i).toString();
 			}
 		}
@@ -149,11 +149,13 @@ public class CircularQueue<E> implements QueueADT<E> {
 	/**
 	 * Inserts the item at the rear of the queue.
 	 * 
-	 * @param item The item to add to the queue.
-	 * @throws FullQueueException if the queue is full
+	 * @param item
+	 *            The item to add to the queue.
+	 * @throws FullQueueException
+	 *             if the queue is full
 	 */
 	public void enqueue(E item) throws FullQueueException {
-		if (this.isEmpty())	
+		if (this.isEmpty())
 			front = 0;
 		if (this.isFull())
 			throw new FullQueueException();
@@ -161,7 +163,7 @@ public class CircularQueue<E> implements QueueADT<E> {
 			if (numItems == maxCapacity) {
 				if (rear > front) {
 					array.set(0, item);
-		 			rear = 0;
+					rear = 0;
 				} else if (rear < front) {
 					array.set(rear + 1, item);
 					rear++;
@@ -170,7 +172,8 @@ public class CircularQueue<E> implements QueueADT<E> {
 				array.add(item);
 				rear++;
 			}
+			numItems++;
 		}
-		numItems++;
+
 	}
 }
